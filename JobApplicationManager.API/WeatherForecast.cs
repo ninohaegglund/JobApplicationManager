@@ -1,4 +1,4 @@
-namespace IdentityService.API
+namespace JobApplicationManager.API
 {
     public class WeatherForecast
     {

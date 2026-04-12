@@ -5,6 +5,8 @@ VisualStudioVersion = 18.5.11626.173 insiders
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IdentityService.API", "IdentityService.API\IdentityService.API.csproj", "{78751FEA-0C3F-44E7-BA24-36C7A3E2FBB9}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JobApplicationManager.API", "JobApplicationManager.API\JobApplicationManager.API.csproj", "{1118758F-29C6-4B84-934F-F2A02650B99D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{78751FEA-0C3F-44E7-BA24-36C7A3E2FBB9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{78751FEA-0C3F-44E7-BA24-36C7A3E2FBB9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{78751FEA-0C3F-44E7-BA24-36C7A3E2FBB9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1118758F-29C6-4B84-934F-F2A02650B99D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1118758F-29C6-4B84-934F-F2A02650B99D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1118758F-29C6-4B84-934F-F2A02650B99D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1118758F-29C6-4B84-934F-F2A02650B99D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
