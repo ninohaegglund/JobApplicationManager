@@ -10,6 +10,8 @@ public class CreateJobApplicationRequest
     [Required]
     [MaxLength(200)]
     public string RoleTitle { get; set; } = string.Empty;
+    [Required]
+    public string Status { get; set; } = "Draft";
     [MaxLength(2000)]
     public string? Notes { get; set; }
 }

@@ -23,7 +23,7 @@ public class JobApplicationService : IJobApplicationService
             CompanyName = request.CompanyName,
             RoleTitle = request.RoleTitle,
             Notes = request.Notes,
-            Status = "Draft",
+            Status = string.IsNullOrWhiteSpace(request.Status) ? "Draft" : request.Status,
             CreatedAt = DateTime.UtcNow
         };
 
@@ -72,6 +72,22 @@ public class JobApplicationService : IJobApplicationService
         application.UpdatedAt = DateTime.UtcNow;
 
         await _context.SaveChangesAsync();
+        return true;
+    }
+
+    public async Task<bool> DeleteAsync(Guid userId, int id)
+    {
+        var application = await _context.JobApplications
+            .FirstOrDefaultAsync(x => x.Id == id && x.UserId == userId);
+
+        if (application is null)
+        {
+            return false;
+        }
+
+        _context.JobApplications.Remove(application);
+        await _context.SaveChangesAsync();
+
         return true;
     }
 

@@ -71,6 +71,18 @@ public class JobApplicationsController : ControllerBase
         return NoContent();
     }
 
+    [HttpDelete("{id:int}")]
+    public async Task<IActionResult> Delete(int id)
+    {
+        var userId = GetUserId();
+        var deleted = await _jobApplicationService.DeleteAsync(userId, id);
+        if (!deleted)
+        {
+            return NotFound();
+        }
+        return NoContent();
+    }
+
     private Guid GetUserId()
     {
         var userIdClaim =

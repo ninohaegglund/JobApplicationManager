@@ -8,4 +8,5 @@ public interface IJobApplicationService
     Task<List<JobApplicationResponse>> GetAllForUserAsync(Guid userId);
     Task<JobApplicationResponse?> GetByIdAsync(Guid userId, int id);
     Task<bool> UpdateStatusAsync(Guid userId, int id, UpdateApplicationStatusRequest request);
+    Task <bool> DeleteAsync(Guid userId, int id);
 }
