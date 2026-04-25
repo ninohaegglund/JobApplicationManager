@@ -109,5 +109,26 @@ namespace IdentityService.API.Services
                 }
             };
         }
+            public async Task<CurrentUserResponseDto> GetCurrentUserAsync(string userId)
+            {
+                if (!Guid.TryParse(userId, out var id))
+                {
+                    return null;
+                }
+
+                var user = await _userRepository.GetByIdAsync(id);
+                if (user == null)
+                {
+                    return null;
+                }
+
+                return new CurrentUserResponseDto
+                {
+                    Id = user.Id.ToString(),
+                    FirstName = user.FirstName,
+                    LastName = user.LastName,
+                    Email = user.Email ?? string.Empty
+                };
+            }
+        }
     }
-}

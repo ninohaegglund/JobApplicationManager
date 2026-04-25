@@ -1,5 +1,7 @@
-﻿using IdentityService.API.DTOs;
+﻿using System.Security.Claims;
+using IdentityService.API.DTOs;
 using IdentityService.API.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace IdentityService.API.Controllers
@@ -41,6 +43,25 @@ namespace IdentityService.API.Controllers
             {
                 return Unauthorized(new { message = ex.Message });
             }
+        }
+
+        [HttpGet("me")]
+        [Authorize]
+        public async Task<IActionResult> GetCurrentUser()
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(userId))
+            {
+                return Unauthorized(new { message = "User ID claim is missing." });
+            }
+
+            var response = await _authService.GetCurrentUserAsync(userId);
+            if (response == null)
+            {
+                return NotFound(new { message = "User not found." });
+            }
+
+            return Ok(response);
         }
     }
 }
