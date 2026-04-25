@@ -22,7 +22,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Features\CvDocuments\" />
     <Folder Include="Features\Exports\" />
     <Folder Include="Features\Jobs\Interfaces\" />
     <Folder Include="Features\Jobs\Services\" />

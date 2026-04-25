@@ -2,6 +2,8 @@ using IdentityService.API.JWT;
 using JobApplicationManager.API.Data.Context;
 using JobApplicationManager.API.Features.Applications.Interfaces;
 using JobApplicationManager.API.Features.Applications.Services;
+using JobApplicationManager.API.Features.CvDocuments.Interfaces;
+using JobApplicationManager.API.Features.CvDocuments.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi;
 
@@ -15,6 +17,7 @@ builder.Services.AddDbContext<DataContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 builder.Services.AddScoped<IJobApplicationService, JobApplicationService>();
+builder.Services.AddScoped<ICvDocumentService, CvDocumentService>();
 
 builder.Services.AddJwtAuthentication(builder.Configuration);
 builder.Services.AddAuthorization();
@@ -40,8 +43,9 @@ builder.Services.AddCors(options =>
     options.AddPolicy("Frontend", policy =>
     {
         policy.WithOrigins("http://localhost:5173")
-        .AllowAnyHeader()
-        .AllowAnyMethod();
+            .AllowAnyHeader()
+            .AllowAnyMethod()
+            .WithExposedHeaders("Content-Disposition");
     });
 });
 

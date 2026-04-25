@@ -12,6 +12,7 @@ public class DataContext : DbContext
     public DbSet<JobApplication> JobApplications => Set<JobApplication>();
     public DbSet<UserProfile> UserProfiles => Set<UserProfile>();
     public DbSet<TextBlock> TextBlocks => Set<TextBlock>();
+    public DbSet<CvDocument> CvDocuments => Set<CvDocument>();
     public DbSet<CoverLetterTemplate> CoverLetterTemplates => Set<CoverLetterTemplate>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -19,5 +20,21 @@ public class DataContext : DbContext
         base.OnModelCreating(modelBuilder);
 
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(DataContext).Assembly);
+        
+        modelBuilder.Entity<CvDocument>()
+            .Property(x => x.Name)
+            .HasMaxLength(200);
+
+        modelBuilder.Entity<CvDocument>()
+            .Property(x => x.OriginalFileName)
+            .HasMaxLength(255);
+
+        modelBuilder.Entity<CvDocument>()
+            .Property(x => x.StoredFileName)
+            .HasMaxLength(255);
+
+        modelBuilder.Entity<CvDocument>()
+            .Property(x => x.ContentType)
+            .HasMaxLength(150);
     }
 }

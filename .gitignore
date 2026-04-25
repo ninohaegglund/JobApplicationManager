@@ -361,3 +361,4 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+/JobApplicationManager.API/Storage/CvDocuments/bba053be-429b-43a7-8878-0645c695e28f
