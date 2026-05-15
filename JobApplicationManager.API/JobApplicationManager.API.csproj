@@ -26,8 +26,6 @@
     <Folder Include="Features\Jobs\Interfaces\" />
     <Folder Include="Features\Jobs\Services\" />
     <Folder Include="Features\Profile\DTOs\" />
-    <Folder Include="Features\Templates\DTOs\" />
-    <Folder Include="Features\TextBlocks\DTOs\" />
   </ItemGroup>
 
   <ItemGroup>
