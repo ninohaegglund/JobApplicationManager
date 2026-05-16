@@ -11,9 +11,8 @@ public class DataContext : DbContext
 
     public DbSet<JobApplication> JobApplications => Set<JobApplication>();
     public DbSet<UserProfile> UserProfiles => Set<UserProfile>();
-    public DbSet<TextBlock> TextBlocks => Set<TextBlock>();
     public DbSet<CvDocument> CvDocuments => Set<CvDocument>();
-    public DbSet<CoverLetterTemplate> CoverLetterTemplates => Set<CoverLetterTemplate>();
+    public DbSet<CalendarEvent> CalendarEvents => Set<CalendarEvent>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
