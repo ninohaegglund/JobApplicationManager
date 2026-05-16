@@ -2,6 +2,8 @@ using IdentityService.API.JWT;
 using JobApplicationManager.API.Data.Context;
 using JobApplicationManager.API.Features.Applications.Interfaces;
 using JobApplicationManager.API.Features.Applications.Services;
+using JobApplicationManager.API.Features.Calendar.Interfaces;
+using JobApplicationManager.API.Features.Calendar.Services;
 using JobApplicationManager.API.Features.CvDocuments.Interfaces;
 using JobApplicationManager.API.Features.CvDocuments.Services;
 using Microsoft.EntityFrameworkCore;
@@ -17,7 +19,9 @@ builder.Services.AddDbContext<DataContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 builder.Services.AddScoped<IJobApplicationService, JobApplicationService>();
+builder.Services.AddScoped<ICalendarEventService, CalendarEventService>();
 builder.Services.AddScoped<ICvDocumentService, CvDocumentService>();
+builder.Services.AddScoped<ICalendarEventService, CalendarEventService>();
 
 builder.Services.AddJwtAuthentication(builder.Configuration);
 builder.Services.AddAuthorization();
