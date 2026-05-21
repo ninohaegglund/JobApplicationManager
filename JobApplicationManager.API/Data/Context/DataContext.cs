@@ -13,6 +13,7 @@ public class DataContext : DbContext
     public DbSet<UserProfile> UserProfiles => Set<UserProfile>();
     public DbSet<CvDocument> CvDocuments => Set<CvDocument>();
     public DbSet<CalendarEvent> CalendarEvents => Set<CalendarEvent>();
+    public DbSet<ApplicationEmail> ApplicationEmails => Set<ApplicationEmail>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

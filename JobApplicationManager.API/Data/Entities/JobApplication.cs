@@ -11,6 +11,8 @@ public class JobApplication
     public string Status { get; set; } = string.Empty;
     public string? Notes { get; set; }
 
+    public ICollection<ApplicationEmail> ApplicationEmails { get; set; } = new List<ApplicationEmail>();
+
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public DateTime? UpdatedAt { get; set; }
 }

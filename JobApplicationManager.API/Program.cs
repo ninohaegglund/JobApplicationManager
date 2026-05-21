@@ -1,5 +1,7 @@
 using IdentityService.API.JWT;
 using JobApplicationManager.API.Data.Context;
+using JobApplicationManager.API.Features.ApplicationEmails.Interfaces;
+using JobApplicationManager.API.Features.ApplicationEmails.Services;
 using JobApplicationManager.API.Features.Applications.Interfaces;
 using JobApplicationManager.API.Features.Applications.Services;
 using JobApplicationManager.API.Features.Calendar.Interfaces;
@@ -19,6 +21,7 @@ builder.Services.AddDbContext<DataContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 builder.Services.AddScoped<IJobApplicationService, JobApplicationService>();
+builder.Services.AddScoped<IApplicationEmailService, ApplicationEmailService>();
 builder.Services.AddScoped<ICalendarEventService, CalendarEventService>();
 builder.Services.AddScoped<ICvDocumentService, CvDocumentService>();
 builder.Services.AddScoped<ICalendarEventService, CalendarEventService>();
@@ -46,7 +49,9 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("Frontend", policy =>
     {
-        policy.WithOrigins("http://localhost:5173")
+        policy.WithOrigins("http://localhost:5173",
+             "https://jobmanagerpro.netlify.app"
+             )
             .AllowAnyHeader()
             .AllowAnyMethod()
             .WithExposedHeaders("Content-Disposition");
