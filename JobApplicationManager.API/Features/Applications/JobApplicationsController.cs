@@ -41,6 +41,16 @@ public class JobApplicationsController : ControllerBase
         return Ok(applications);
     }
 
+    [HttpGet("export")]
+    public async Task<IActionResult> ExportToExcel()
+    {
+        var userId = GetUserId();
+
+        var export = await _jobApplicationService.ExportToExcelAsync(userId);
+
+        return File(export.Content, export.ContentType, export.FileName);
+    }
+
     [HttpGet("{id:int}")]
     public async Task<ActionResult<JobApplicationResponse>> GetById(int id)
     {

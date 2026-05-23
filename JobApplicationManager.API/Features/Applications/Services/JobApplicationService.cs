@@ -2,12 +2,14 @@
 using JobApplicationManager.API.Data.Entities;
 using JobApplicationManager.API.Features.Applications.DTOs;
 using JobApplicationManager.API.Features.Applications.Interfaces;
+using JobApplicationManager.API.Features.Exports;
 using Microsoft.EntityFrameworkCore;
 
 namespace JobApplicationManager.API.Features.Applications.Services;
 
 public class JobApplicationService : IJobApplicationService
 {
+    private const string ExcelContentType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
     private readonly DataContext _context;
 
     public JobApplicationService(DataContext context)
@@ -56,6 +58,32 @@ public class JobApplicationService : IJobApplicationService
         }
 
         return MapToResponse(application);
+    }
+
+    public async Task<JobApplicationsExportFile> ExportToExcelAsync(Guid userId)
+    {
+        var applications = await _context.JobApplications
+            .AsNoTracking()
+            .Where(x => x.UserId == userId)
+            .OrderByDescending(x => x.CreatedAt)
+            .Select(x => new JobApplicationResponse
+            {
+                Id = x.Id,
+                CompanyName = x.CompanyName,
+                RoleTitle = x.RoleTitle,
+                Status = x.Status,
+                Notes = x.Notes,
+                CreatedAt = x.CreatedAt,
+                UpdatedAt = x.UpdatedAt
+            })
+            .ToListAsync();
+
+        return new JobApplicationsExportFile
+        {
+            Content = JobApplicationsExcelExporter.CreateWorkbook(applications),
+            ContentType = ExcelContentType,
+            FileName = $"job-applications-{DateTime.UtcNow:yyyyMMddHHmmss}.xlsx"
+        };
     }
 
     public async Task<bool> UpdateStatusAsync(Guid userId, int id, UpdateApplicationStatusRequest request)
