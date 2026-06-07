@@ -1,6 +1,6 @@
 # JobApplicationManager
 
-A fullstack web application for searching, saving, and managing job applications in one place. The project is built as a personal job application manager where users can search job ads, save interesting positions, track application status, and keep a structured overview of their job search process.
+A fullstack web application for saving and managing job applications in one place. The project is built as a personal job application manager where users can track application statu and keep a structured overview of their job search process.
 
 ## Overview
 
@@ -10,9 +10,6 @@ The project demonstrates fullstack development with .NET, API integration, authe
 
 ## Features
 
-* Search job ads through an external job search API
-* View job ad details
-* Save interesting jobs to a personal list
 * Track application status
 * Organize applications by status, for example saved, applied, interview, rejected, or offer
 * Store user-specific application data
@@ -41,10 +38,6 @@ The project demonstrates fullstack development with .NET, API integration, authe
 * CSS
 * API integration using HTTP requests
 
-### External API
-
-* Arbetsförmedlingen Job Search API / JobTech API
-
 ## Project Purpose
 
 The purpose of this project is to build a realistic application that combines several important parts of modern web development:
@@ -55,10 +48,6 @@ The purpose of this project is to build a realistic application that combines se
 * Persisting data in a relational database
 * Building a frontend that communicates with a backend API
 * Creating a useful tool based on a real-world problem
-
-## Example Use Case
-
-A user can search for jobs, open a job ad, save it to their personal list, and later update the status when they apply or receive feedback. This makes it easier to keep track of applications and avoid losing interesting job opportunities.
 
 ## Architecture
 
@@ -131,11 +120,8 @@ dotnet run
 
 ### 3. Frontend setup
 
-Navigate to the frontend project folder:
+https://github.com/ninohaegglund/JobApplicationManagerUI
 
-```bash
-cd frontend
-```
 
 Install dependencies:
 
@@ -180,10 +166,7 @@ Example statuses that can be used in the application:
 
 ## Planned Improvements
 
-* Export saved applications to Excel
 * Add filtering by status, date, company, and role
-* Add dashboard statistics
-* Add reminders for follow-ups
 * Improve search filters
 * Add pagination for search results
 * Add validation and better error handling
@@ -202,15 +185,6 @@ Through this project, I practiced:
 * Handling authentication and user-specific data
 * Designing a project that solves a practical problem
 
-## Screenshots
-
-Add screenshots here when available.
-
-```text
-/images/job-search.png
-/images/saved-applications.png
-/images/application-details.png
-```
 
 ## Author
 
