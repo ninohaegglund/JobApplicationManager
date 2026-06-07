@@ -3,6 +3,7 @@ using JobApplicationManager.API.Data.Entities;
 using JobApplicationManager.API.Features.Applications.DTOs;
 using JobApplicationManager.API.Features.Applications.Interfaces;
 using JobApplicationManager.API.Features.Exports;
+using JobApplicationManager.API.Features.Notifications.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
 namespace JobApplicationManager.API.Features.Applications.Services;
@@ -11,10 +12,12 @@ public class JobApplicationService : IJobApplicationService
 {
     private const string ExcelContentType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
     private readonly DataContext _context;
+    private readonly INotificationService _notificationService;
 
-    public JobApplicationService(DataContext context)
+    public JobApplicationService(DataContext context, INotificationService notificationService)
     {
         _context = context;
+        _notificationService = notificationService;
     }
 
     public async Task<JobApplicationResponse> CreateAsync(Guid userId, CreateJobApplicationRequest request)
@@ -35,10 +38,23 @@ public class JobApplicationService : IJobApplicationService
         return MapToResponse(entity);
     }
 
-    public async Task<List<JobApplicationResponse>> GetAllForUserAsync(Guid userId)
+    public async Task<List<JobApplicationResponse>> GetAllForUserAsync(Guid userId, string? search = null)
     {
-        var applications = await _context.JobApplications
+        var query = _context.JobApplications
+            .AsNoTracking()
             .Where(x => x.UserId == userId)
+            .AsQueryable();
+
+        if (!string.IsNullOrWhiteSpace(search))
+        {
+            var searchTerm = search.Trim();
+
+            query = query.Where(x =>
+                x.CompanyName.Contains(searchTerm) ||
+                x.RoleTitle.Contains(searchTerm));
+        }
+
+        var applications = await query
             .OrderByDescending(x => x.CreatedAt)
             .ToListAsync();
 
@@ -96,10 +112,24 @@ public class JobApplicationService : IJobApplicationService
             return false;
         }
 
-        application.Status = request.Status;
+        var newStatus = request.Status.Trim();
+        var statusChanged = !string.Equals(application.Status, newStatus, StringComparison.Ordinal);
+
+        application.Status = newStatus;
         application.UpdatedAt = DateTime.UtcNow;
 
         await _context.SaveChangesAsync();
+
+        if (statusChanged)
+        {
+            await _notificationService.CreateApplicationUpdatedAsync(
+                userId,
+                application.Id,
+                application.CompanyName,
+                application.RoleTitle,
+                application.Status);
+        }
+
         return true;
     }
 

@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using JobApplicationManager.API.Features.Calendar.DTOs;
 using JobApplicationManager.API.Features.Calendar.Interfaces;
 using Microsoft.AspNetCore.Authorization;
@@ -20,9 +21,11 @@ public class CalendarEventsController : ControllerBase
     [HttpPost]
     public async Task<ActionResult<CalendarEventResponse>> Create([FromBody] CreateCalendarEventRequest request)
     {
+        var userId = GetUserId();
+
         try
         {
-            var createdEvent = await _calendarEventService.CreateAsync(request);
+            var createdEvent = await _calendarEventService.CreateAsync(userId, request);
 
             return CreatedAtAction(
                 nameof(GetById),
@@ -38,7 +41,8 @@ public class CalendarEventsController : ControllerBase
     [HttpGet]
     public async Task<ActionResult<List<CalendarEventResponse>>> GetAll()
     {
-        var events = await _calendarEventService.GetAllAsync();
+        var userId = GetUserId();
+        var events = await _calendarEventService.GetAllAsync(userId);
 
         return Ok(events);
     }
@@ -46,7 +50,8 @@ public class CalendarEventsController : ControllerBase
     [HttpGet("upcoming")]
     public async Task<ActionResult<List<CalendarEventResponse>>> GetUpcoming()
     {
-        var events = await _calendarEventService.GetUpcomingAsync();
+        var userId = GetUserId();
+        var events = await _calendarEventService.GetUpcomingAsync(userId);
 
         return Ok(events);
     }
@@ -54,7 +59,8 @@ public class CalendarEventsController : ControllerBase
     [HttpGet("{id:int}")]
     public async Task<ActionResult<CalendarEventResponse>> GetById(int id)
     {
-        var calendarEvent = await _calendarEventService.GetByIdAsync(id);
+        var userId = GetUserId();
+        var calendarEvent = await _calendarEventService.GetByIdAsync(userId, id);
 
         if (calendarEvent is null)
         {
@@ -69,9 +75,11 @@ public class CalendarEventsController : ControllerBase
         int id,
         [FromBody] UpdateCalendarEventRequest request)
     {
+        var userId = GetUserId();
+
         try
         {
-            var updatedEvent = await _calendarEventService.UpdateAsync(id, request);
+            var updatedEvent = await _calendarEventService.UpdateAsync(userId, id, request);
 
             if (updatedEvent is null)
             {
@@ -89,7 +97,8 @@ public class CalendarEventsController : ControllerBase
     [HttpDelete("{id:int}")]
     public async Task<IActionResult> Delete(int id)
     {
-        var deleted = await _calendarEventService.DeleteAsync(id);
+        var userId = GetUserId();
+        var deleted = await _calendarEventService.DeleteAsync(userId, id);
 
         if (!deleted)
         {
@@ -97,5 +106,19 @@ public class CalendarEventsController : ControllerBase
         }
 
         return NoContent();
+    }
+
+    private Guid GetUserId()
+    {
+        var userIdClaim =
+            User.FindFirst(ClaimTypes.NameIdentifier)?.Value ??
+            User.FindFirst("sub")?.Value;
+
+        if (string.IsNullOrWhiteSpace(userIdClaim) || !Guid.TryParse(userIdClaim, out var userId))
+        {
+            throw new UnauthorizedAccessException("Invalid or missing user ID claim.");
+        }
+
+        return userId;
     }
 }

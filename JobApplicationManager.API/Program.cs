@@ -8,6 +8,8 @@ using JobApplicationManager.API.Features.Calendar.Interfaces;
 using JobApplicationManager.API.Features.Calendar.Services;
 using JobApplicationManager.API.Features.CvDocuments.Interfaces;
 using JobApplicationManager.API.Features.CvDocuments.Services;
+using JobApplicationManager.API.Features.Notifications.Interfaces;
+using JobApplicationManager.API.Features.Notifications.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi;
 
@@ -24,7 +26,7 @@ builder.Services.AddScoped<IJobApplicationService, JobApplicationService>();
 builder.Services.AddScoped<IApplicationEmailService, ApplicationEmailService>();
 builder.Services.AddScoped<ICalendarEventService, CalendarEventService>();
 builder.Services.AddScoped<ICvDocumentService, CvDocumentService>();
-builder.Services.AddScoped<ICalendarEventService, CalendarEventService>();
+builder.Services.AddScoped<INotificationService, NotificationService>();
 
 builder.Services.AddJwtAuthentication(builder.Configuration);
 builder.Services.AddAuthorization();

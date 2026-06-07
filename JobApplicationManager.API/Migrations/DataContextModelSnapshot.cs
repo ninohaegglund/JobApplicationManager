@@ -107,9 +107,14 @@ namespace JobApplicationManager.API.Migrations
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime2");
 
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.HasKey("Id");
 
                     b.HasIndex("JobApplicationId");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("CalendarEvents");
                 });
@@ -207,6 +212,62 @@ namespace JobApplicationManager.API.Migrations
                     b.ToTable("JobApplications");
                 });
 
+            modelBuilder.Entity("JobApplicationManager.API.Data.Entities.Notification", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("DueAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsRead")
+                        .HasColumnType("bit");
+
+                    b.Property<int?>("JobApplicationId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Message")
+                        .IsRequired()
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<DateTime?>("ReadAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("SourceKey")
+                        .HasMaxLength(250)
+                        .HasColumnType("nvarchar(250)");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(150)
+                        .HasColumnType("nvarchar(150)");
+
+                    b.Property<int>("Type")
+                        .HasColumnType("int");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("JobApplicationId");
+
+                    b.HasIndex("UserId", "SourceKey")
+                        .IsUnique()
+                        .HasFilter("[SourceKey] IS NOT NULL");
+
+                    b.HasIndex("UserId", "IsRead", "CreatedAt");
+
+                    b.ToTable("Notifications");
+                });
+
             modelBuilder.Entity("JobApplicationManager.API.Data.Entities.UserProfile", b =>
                 {
                     b.Property<Guid>("Id")
@@ -287,9 +348,21 @@ namespace JobApplicationManager.API.Migrations
                     b.Navigation("JobApplication");
                 });
 
+            modelBuilder.Entity("JobApplicationManager.API.Data.Entities.Notification", b =>
+                {
+                    b.HasOne("JobApplicationManager.API.Data.Entities.JobApplication", "JobApplication")
+                        .WithMany("Notifications")
+                        .HasForeignKey("JobApplicationId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("JobApplication");
+                });
+
             modelBuilder.Entity("JobApplicationManager.API.Data.Entities.JobApplication", b =>
                 {
                     b.Navigation("ApplicationEmails");
+
+                    b.Navigation("Notifications");
                 });
 #pragma warning restore 612, 618
         }

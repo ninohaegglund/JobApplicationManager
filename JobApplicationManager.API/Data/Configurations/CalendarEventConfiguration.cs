@@ -26,6 +26,8 @@ public class CalendarEventConfiguration : IEntityTypeConfiguration<CalendarEvent
         builder.Property(x => x.StartDateTime)
             .IsRequired();
 
+        builder.HasIndex(x => x.UserId);
+
         builder.HasOne(x => x.JobApplication)
             .WithMany()
             .HasForeignKey(x => x.JobApplicationId)

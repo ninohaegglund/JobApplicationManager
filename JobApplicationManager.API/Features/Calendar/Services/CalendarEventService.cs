@@ -15,11 +15,12 @@ public class CalendarEventService : ICalendarEventService
         _context = context;
     }
 
-    public async Task<List<CalendarEventResponse>> GetAllAsync()
+    public async Task<List<CalendarEventResponse>> GetAllAsync(Guid userId)
     {
         var events = await _context.CalendarEvents
             .AsNoTracking()
             .Include(x => x.JobApplication)
+            .Where(x => x.UserId == userId)
             .OrderBy(x => x.StartDateTime)
             .ToListAsync();
 
@@ -28,14 +29,14 @@ public class CalendarEventService : ICalendarEventService
             .ToList();
     }
 
-    public async Task<List<CalendarEventResponse>> GetUpcomingAsync()
+    public async Task<List<CalendarEventResponse>> GetUpcomingAsync(Guid userId)
     {
         var now = DateTime.UtcNow;
 
         var events = await _context.CalendarEvents
             .AsNoTracking()
             .Include(x => x.JobApplication)
-            .Where(x => x.StartDateTime >= now && !x.IsCompleted)
+            .Where(x => x.UserId == userId && x.StartDateTime >= now && !x.IsCompleted)
             .OrderBy(x => x.StartDateTime)
             .ToListAsync();
 
@@ -44,12 +45,12 @@ public class CalendarEventService : ICalendarEventService
             .ToList();
     }
 
-    public async Task<CalendarEventResponse?> GetByIdAsync(int id)
+    public async Task<CalendarEventResponse?> GetByIdAsync(Guid userId, int id)
     {
         var calendarEvent = await _context.CalendarEvents
             .AsNoTracking()
             .Include(x => x.JobApplication)
-            .FirstOrDefaultAsync(x => x.Id == id);
+            .FirstOrDefaultAsync(x => x.Id == id && x.UserId == userId);
 
         if (calendarEvent is null)
         {
@@ -59,14 +60,15 @@ public class CalendarEventService : ICalendarEventService
         return MapToResponse(calendarEvent);
     }
 
-    public async Task<CalendarEventResponse> CreateAsync(CreateCalendarEventRequest request)
+    public async Task<CalendarEventResponse> CreateAsync(Guid userId, CreateCalendarEventRequest request)
     {
         ValidateRequest(request.Title, request.StartDateTime, request.EndDateTime);
 
-        var jobApplication = await GetJobApplicationOrThrowAsync(request.JobApplicationId);
+        var jobApplication = await GetJobApplicationOrThrowAsync(userId, request.JobApplicationId);
 
         var calendarEvent = new CalendarEvent
         {
+            UserId = userId,
             JobApplicationId = request.JobApplicationId,
             JobApplication = jobApplication,
             Title = request.Title.Trim(),
@@ -85,21 +87,22 @@ public class CalendarEventService : ICalendarEventService
         return MapToResponse(calendarEvent);
     }
 
-    public async Task<CalendarEventResponse?> UpdateAsync(int id, UpdateCalendarEventRequest request)
+    public async Task<CalendarEventResponse?> UpdateAsync(Guid userId, int id, UpdateCalendarEventRequest request)
     {
         ValidateRequest(request.Title, request.StartDateTime, request.EndDateTime);
 
         var calendarEvent = await _context.CalendarEvents
             .Include(x => x.JobApplication)
-            .FirstOrDefaultAsync(x => x.Id == id);
+            .FirstOrDefaultAsync(x => x.Id == id && x.UserId == userId);
 
         if (calendarEvent is null)
         {
             return null;
         }
 
-        var jobApplication = await GetJobApplicationOrThrowAsync(request.JobApplicationId);
+        var jobApplication = await GetJobApplicationOrThrowAsync(userId, request.JobApplicationId);
 
+        calendarEvent.UserId = userId;
         calendarEvent.JobApplicationId = request.JobApplicationId;
         calendarEvent.JobApplication = jobApplication;
         calendarEvent.Title = request.Title.Trim();
@@ -116,10 +119,10 @@ public class CalendarEventService : ICalendarEventService
         return MapToResponse(calendarEvent);
     }
 
-    public async Task<bool> DeleteAsync(int id)
+    public async Task<bool> DeleteAsync(Guid userId, int id)
     {
         var calendarEvent = await _context.CalendarEvents
-            .FirstOrDefaultAsync(x => x.Id == id);
+            .FirstOrDefaultAsync(x => x.Id == id && x.UserId == userId);
 
         if (calendarEvent is null)
         {
@@ -132,7 +135,7 @@ public class CalendarEventService : ICalendarEventService
         return true;
     }
 
-    private async Task<JobApplication?> GetJobApplicationOrThrowAsync(int? jobApplicationId)
+    private async Task<JobApplication?> GetJobApplicationOrThrowAsync(Guid userId, int? jobApplicationId)
     {
         if (!jobApplicationId.HasValue)
         {
@@ -140,7 +143,7 @@ public class CalendarEventService : ICalendarEventService
         }
 
         var jobApplication = await _context.JobApplications
-            .FirstOrDefaultAsync(x => x.Id == jobApplicationId.Value);
+            .FirstOrDefaultAsync(x => x.Id == jobApplicationId.Value && x.UserId == userId);
 
         if (jobApplication is null)
         {

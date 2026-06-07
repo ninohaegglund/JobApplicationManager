@@ -32,11 +32,11 @@ public class JobApplicationsController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<ActionResult<List<JobApplicationResponse>>> GetAll()
+    public async Task<ActionResult<List<JobApplicationResponse>>> GetAll([FromQuery] string? search)
     {
         var userId = GetUserId();
 
-        var applications = await _jobApplicationService.GetAllForUserAsync(userId);
+        var applications = await _jobApplicationService.GetAllForUserAsync(userId, search);
 
         return Ok(applications);
     }

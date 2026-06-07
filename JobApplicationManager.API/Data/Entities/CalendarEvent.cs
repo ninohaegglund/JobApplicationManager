@@ -6,6 +6,8 @@ public class CalendarEvent
 {
     public int Id { get; set; }
 
+    public Guid UserId { get; set; }
+
     public int? JobApplicationId { get; set; }
     public JobApplication? JobApplication { get; set; }
 

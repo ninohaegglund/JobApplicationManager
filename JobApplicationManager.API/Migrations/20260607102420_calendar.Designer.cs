@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace JobApplicationManager.API.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20260424150710_AddCvDocuments")]
-    partial class AddCvDocuments
+    [Migration("20260607102420_calendar")]
+    partial class calendar
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -25,22 +25,87 @@ namespace JobApplicationManager.API.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("JobApplicationManager.API.Data.Entities.CoverLetterTemplate", b =>
+            modelBuilder.Entity("JobApplicationManager.API.Data.Entities.ApplicationEmail", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("int");
 
-                    b.Property<string>("ContentTemplate")
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Body")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("Name")
+                    b.Property<int>("JobApplicationId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("ReceivedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Sender")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<string>("Subject")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<int>("Type")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(0);
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("JobApplicationId");
+
+                    b.ToTable("ApplicationEmails");
+                });
+
+            modelBuilder.Entity("JobApplicationManager.API.Data.Entities.CalendarEvent", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<DateTime?>("EndDateTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("EventType")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsCompleted")
+                        .HasColumnType("bit");
+
+                    b.Property<int?>("JobApplicationId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Location")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<DateTime>("StartDateTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(150)
+                        .HasColumnType("nvarchar(150)");
 
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime2");
@@ -50,7 +115,11 @@ namespace JobApplicationManager.API.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("CoverLetterTemplates");
+                    b.HasIndex("JobApplicationId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("CalendarEvents");
                 });
 
             modelBuilder.Entity("JobApplicationManager.API.Data.Entities.CvDocument", b =>
@@ -146,39 +215,60 @@ namespace JobApplicationManager.API.Migrations
                     b.ToTable("JobApplications");
                 });
 
-            modelBuilder.Entity("JobApplicationManager.API.Data.Entities.TextBlock", b =>
+            modelBuilder.Entity("JobApplicationManager.API.Data.Entities.Notification", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("int");
 
-                    b.Property<string>("Category")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Content")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<bool>("IsDefault")
+                    b.Property<DateTime?>("DueAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsRead")
                         .HasColumnType("bit");
 
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int?>("JobApplicationId")
+                        .HasColumnType("int");
 
-                    b.Property<DateTime?>("UpdatedAt")
+                    b.Property<string>("Message")
+                        .IsRequired()
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<DateTime?>("ReadAt")
                         .HasColumnType("datetime2");
+
+                    b.Property<string>("SourceKey")
+                        .HasMaxLength(250)
+                        .HasColumnType("nvarchar(250)");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(150)
+                        .HasColumnType("nvarchar(150)");
+
+                    b.Property<int>("Type")
+                        .HasColumnType("int");
 
                     b.Property<Guid>("UserId")
                         .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
 
-                    b.ToTable("TextBlocks");
+                    b.HasIndex("JobApplicationId");
+
+                    b.HasIndex("UserId", "SourceKey")
+                        .IsUnique()
+                        .HasFilter("[SourceKey] IS NOT NULL");
+
+                    b.HasIndex("UserId", "IsRead", "CreatedAt");
+
+                    b.ToTable("Notifications");
                 });
 
             modelBuilder.Entity("JobApplicationManager.API.Data.Entities.UserProfile", b =>
@@ -238,6 +328,44 @@ namespace JobApplicationManager.API.Migrations
                         .IsUnique();
 
                     b.ToTable("UserProfiles");
+                });
+
+            modelBuilder.Entity("JobApplicationManager.API.Data.Entities.ApplicationEmail", b =>
+                {
+                    b.HasOne("JobApplicationManager.API.Data.Entities.JobApplication", "JobApplication")
+                        .WithMany("ApplicationEmails")
+                        .HasForeignKey("JobApplicationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("JobApplication");
+                });
+
+            modelBuilder.Entity("JobApplicationManager.API.Data.Entities.CalendarEvent", b =>
+                {
+                    b.HasOne("JobApplicationManager.API.Data.Entities.JobApplication", "JobApplication")
+                        .WithMany()
+                        .HasForeignKey("JobApplicationId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("JobApplication");
+                });
+
+            modelBuilder.Entity("JobApplicationManager.API.Data.Entities.Notification", b =>
+                {
+                    b.HasOne("JobApplicationManager.API.Data.Entities.JobApplication", "JobApplication")
+                        .WithMany("Notifications")
+                        .HasForeignKey("JobApplicationId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("JobApplication");
+                });
+
+            modelBuilder.Entity("JobApplicationManager.API.Data.Entities.JobApplication", b =>
+                {
+                    b.Navigation("ApplicationEmails");
+
+                    b.Navigation("Notifications");
                 });
 #pragma warning restore 612, 618
         }

@@ -12,6 +12,7 @@ public class JobApplication
     public string? Notes { get; set; }
 
     public ICollection<ApplicationEmail> ApplicationEmails { get; set; } = new List<ApplicationEmail>();
+    public ICollection<Notification> Notifications { get; set; } = new List<Notification>();
 
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public DateTime? UpdatedAt { get; set; }

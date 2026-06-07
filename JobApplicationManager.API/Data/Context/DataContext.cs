@@ -14,6 +14,7 @@ public class DataContext : DbContext
     public DbSet<CvDocument> CvDocuments => Set<CvDocument>();
     public DbSet<CalendarEvent> CalendarEvents => Set<CalendarEvent>();
     public DbSet<ApplicationEmail> ApplicationEmails => Set<ApplicationEmail>();
+    public DbSet<Notification> Notifications => Set<Notification>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
