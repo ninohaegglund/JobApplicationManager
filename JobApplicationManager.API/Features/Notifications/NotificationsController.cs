@@ -66,6 +66,32 @@ public class NotificationsController : ControllerBase
         });
     }
 
+    [HttpDelete("{id:int}")]
+    public async Task<IActionResult> Delete(int id)
+    {
+        var userId = GetUserId();
+        var deleted = await _notificationService.DeleteAsync(userId, id);
+
+        if (!deleted)
+        {
+            return NotFound();
+        }
+
+        return NoContent();
+    }
+
+    [HttpDelete]
+    public async Task<ActionResult<NotificationDeleteResponse>> DeleteAll()
+    {
+        var userId = GetUserId();
+        var deletedCount = await _notificationService.DeleteAllForUserAsync(userId);
+
+        return Ok(new NotificationDeleteResponse
+        {
+            DeletedCount = deletedCount
+        });
+    }
+
     private Guid GetUserId()
     {
         var userIdClaim =

@@ -22,5 +22,7 @@ public class Notification
     public DateTime? DueAt { get; set; }
     public string? SourceKey { get; set; }
 
+    public DateTime? DeletedAt { get; set; }
+
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 }

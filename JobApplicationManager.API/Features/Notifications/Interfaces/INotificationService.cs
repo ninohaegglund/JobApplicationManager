@@ -8,6 +8,8 @@ public interface INotificationService
     Task<int> GetUnreadCountAsync(Guid userId);
     Task<bool> MarkAsReadAsync(Guid userId, int id);
     Task<int> MarkAllAsReadAsync(Guid userId);
+    Task<bool> DeleteAsync(Guid userId, int id);
+    Task<int> DeleteAllForUserAsync(Guid userId);
     Task CreateApplicationUpdatedAsync(
         Guid userId,
         int jobApplicationId,

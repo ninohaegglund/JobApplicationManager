@@ -26,7 +26,7 @@ public class NotificationService : INotificationService
         var query = _context.Notifications
             .AsNoTracking()
             .Include(x => x.JobApplication)
-            .Where(x => x.UserId == userId);
+            .Where(x => x.UserId == userId && x.DeletedAt == null);
 
         if (unreadOnly)
         {
@@ -48,13 +48,13 @@ public class NotificationService : INotificationService
         await SyncGeneratedNotificationsAsync(userId);
 
         return await _context.Notifications
-            .CountAsync(x => x.UserId == userId && !x.IsRead);
+            .CountAsync(x => x.UserId == userId && !x.IsRead && x.DeletedAt == null);
     }
 
     public async Task<bool> MarkAsReadAsync(Guid userId, int id)
     {
         var notification = await _context.Notifications
-            .FirstOrDefaultAsync(x => x.Id == id && x.UserId == userId);
+            .FirstOrDefaultAsync(x => x.Id == id && x.UserId == userId && x.DeletedAt == null);
 
         if (notification is null)
         {
@@ -74,7 +74,7 @@ public class NotificationService : INotificationService
     public async Task<int> MarkAllAsReadAsync(Guid userId)
     {
         var notifications = await _context.Notifications
-            .Where(x => x.UserId == userId && !x.IsRead)
+            .Where(x => x.UserId == userId && !x.IsRead && x.DeletedAt == null)
             .ToListAsync();
 
         if (notifications.Count == 0)
@@ -87,6 +87,44 @@ public class NotificationService : INotificationService
         {
             notification.IsRead = true;
             notification.ReadAt = readAt;
+        }
+
+        await _context.SaveChangesAsync();
+
+        return notifications.Count;
+    }
+
+    public async Task<bool> DeleteAsync(Guid userId, int id)
+    {
+        var notification = await _context.Notifications
+            .FirstOrDefaultAsync(x => x.Id == id && x.UserId == userId && x.DeletedAt == null);
+
+        if (notification is null)
+        {
+            return false;
+        }
+
+        notification.DeletedAt = DateTime.UtcNow;
+        await _context.SaveChangesAsync();
+
+        return true;
+    }
+
+    public async Task<int> DeleteAllForUserAsync(Guid userId)
+    {
+        var notifications = await _context.Notifications
+            .Where(x => x.UserId == userId && x.DeletedAt == null)
+            .ToListAsync();
+
+        if (notifications.Count == 0)
+        {
+            return 0;
+        }
+
+        var deletedAt = DateTime.UtcNow;
+        foreach (var notification in notifications)
+        {
+            notification.DeletedAt = deletedAt;
         }
 
         await _context.SaveChangesAsync();
